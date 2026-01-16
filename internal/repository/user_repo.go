@@ -31,7 +31,8 @@ func (r *repository) Create(ctx context.Context, record *domain.User) (*domain.U
 	})
 
 	if err != nil {
-		return nil, err
+
+		return nil, MapDBError(err, "user")
 	}
 
 	return toDomain(createdRecord), nil
@@ -40,7 +41,7 @@ func (r *repository) Create(ctx context.Context, record *domain.User) (*domain.U
 func (r *repository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	record, err := r.queries.GetUser(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, MapDBError(err, "user")
 	}
 
 	return toDomain(record), nil

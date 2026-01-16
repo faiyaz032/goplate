@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/faiyaz032/goplate/internal/domain"
+	"github.com/faiyaz032/goplate/internal/rest/response"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -22,22 +24,28 @@ func NewHandler(validate *validator.Validate, svc Service) *Handler {
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	dto := new(RegisterUserDTO)
 	if err := json.NewDecoder(r.Body).Decode(dto); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		response.HandleError(w, &domain.AppError{
+			Err:     domain.ErrBadRequest,
+			Message: "Invalid request body",
+			Raw:     err,
+		})
 		return
 	}
 
 	if err := h.validate.Struct(dto); err != nil {
-		http.Error(w, "validation failed: "+err.Error(), http.StatusUnprocessableEntity)
+		response.HandleError(w, &domain.AppError{
+			Err:     domain.ErrUnprocessable,
+			Message: err.Error(),
+			Raw:     err,
+		})
 		return
 	}
 
-	createdUser, err := h.svc.Register(r.Context(), dto.toDomain())
+	user, err := h.svc.Register(r.Context(), dto.toDomain())
 	if err != nil {
-		http.Error(w, "failed to register user: "+err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(createdUser)
+	response.JSON(w, http.StatusCreated, "User registered successfully", user)
 }
