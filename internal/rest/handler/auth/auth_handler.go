@@ -4,28 +4,34 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/faiyaz032/goplate/internal/domain"
+	"github.com/go-playground/validator/v10"
 )
 
 type Handler struct {
-	svc Service
+	svc      Service
+	validate *validator.Validate
 }
 
-func NewHandler(svc Service) *Handler {
+func NewHandler(svc Service, validate *validator.Validate) *Handler {
 	return &Handler{
-		svc,
+		svc:      svc,
+		validate: validate,
 	}
 }
 
-// Register handles user registration
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
-	var user domain.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	dto := new(RegisterUserDTO)
+	if err := json.NewDecoder(r.Body).Decode(dto); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	createdUser, err := h.svc.Register(r.Context(), &user)
+	if err := h.validate.Struct(dto); err != nil {
+		http.Error(w, "validation failed: "+err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	createdUser, err := h.svc.Register(r.Context(), dto.toDomain())
 	if err != nil {
 		http.Error(w, "failed to register user: "+err.Error(), http.StatusInternalServerError)
 		return

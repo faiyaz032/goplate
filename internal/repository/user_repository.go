@@ -19,7 +19,7 @@ type repository struct {
 
 func NewUserRepository(queries *db.Queries) UserRepository {
 	return &repository{
-		queries,
+		queries: queries,
 	}
 }
 
@@ -34,13 +34,7 @@ func (r *repository) Create(ctx context.Context, record *domain.User) (*domain.U
 		return nil, err
 	}
 
-	return &domain.User{
-		ID:        createdRecord.ID,
-		Username:  createdRecord.Username,
-		Email:     createdRecord.Email,
-		Password:  createdRecord.Password,
-		CreatedAt: timeFromTimestamptz(createdRecord.CreatedAt),
-	}, nil
+	return toDomain(createdRecord), nil
 }
 
 func (r *repository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
@@ -49,11 +43,15 @@ func (r *repository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, 
 		return nil, err
 	}
 
+	return toDomain(record), nil
+}
+
+func toDomain(record db.User) *domain.User {
 	return &domain.User{
 		ID:        record.ID,
 		Username:  record.Username,
 		Email:     record.Email,
 		Password:  record.Password,
 		CreatedAt: timeFromTimestamptz(record.CreatedAt),
-	}, nil
+	}
 }

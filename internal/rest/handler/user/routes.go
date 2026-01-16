@@ -1,4 +1,4 @@
-package user
+package userhandler
 
 import "github.com/go-chi/chi/v5"
 
