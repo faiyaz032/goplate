@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/faiyaz032/goplate/internal/domain"
-	"github.com/faiyaz032/goplate/internal/rest/auth"
+	authhandler "github.com/faiyaz032/goplate/internal/rest/handler/auth"
+
 	"github.com/google/uuid"
 )
 
 type Service interface {
-	auth.Service
+	authhandler.Service
 }
 
 type UserSvc interface {

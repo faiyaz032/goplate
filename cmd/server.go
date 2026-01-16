@@ -10,8 +10,9 @@ import (
 	"github.com/faiyaz032/goplate/internal/config"
 	"github.com/faiyaz032/goplate/internal/infrastructure/db/postgres"
 	"github.com/faiyaz032/goplate/internal/repository"
-	authHandler "github.com/faiyaz032/goplate/internal/rest/auth"
-	userHandler "github.com/faiyaz032/goplate/internal/rest/user"
+	authhandler "github.com/faiyaz032/goplate/internal/rest/handler/auth"
+	userhandler "github.com/faiyaz032/goplate/internal/rest/handler/user"
+
 	"github.com/faiyaz032/goplate/internal/user"
 	"github.com/go-chi/chi/v5"
 )
@@ -28,15 +29,15 @@ func run(ctx context.Context, cfg *config.Config) error {
 	// dependency injection
 	userRepo := repository.NewUserRepository(queries)
 	userSvc := user.NewService(userRepo)
-	userHndlr := userHandler.NewHandler(userSvc)
+	userHndlr := userhandler.NewHandler(userSvc)
 
 	authSvc := auth.NewService(userSvc)
-	authHndlr := authHandler.NewHandler(authSvc)
+	authHndlr := authhandler.NewHandler(authSvc)
 
 	// routing
 	r := chi.NewRouter()
-	userHandler.RegisterRoutes(r, userHndlr)
-	authHandler.RegisterRoutes(r, authHndlr)
+	userhandler.RegisterRoutes(r, userHndlr)
+	authhandler.RegisterRoutes(r, authHndlr)
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

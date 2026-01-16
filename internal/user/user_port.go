@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/faiyaz032/goplate/internal/domain"
-	userHandler "github.com/faiyaz032/goplate/internal/rest/user"
+	userHandler "github.com/faiyaz032/goplate/internal/rest/handler/user"
 	"github.com/google/uuid"
 )
 

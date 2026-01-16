@@ -1,4 +1,4 @@
-package user
+package authhandler
 
 import (
 	"encoding/json"
@@ -17,16 +17,17 @@ func NewHandler(svc Service) *Handler {
 	}
 }
 
-func (h Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
+// Register handles user registration
+func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	var user domain.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	createdUser, err := h.svc.Create(r.Context(), &user)
+	createdUser, err := h.svc.Register(r.Context(), &user)
 	if err != nil {
-		http.Error(w, "failed to create user: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "failed to register user: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

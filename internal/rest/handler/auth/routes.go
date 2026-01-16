@@ -1,4 +1,4 @@
-package auth
+package authhandler
 
 import "github.com/go-chi/chi/v5"
 
