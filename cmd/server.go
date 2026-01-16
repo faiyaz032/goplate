@@ -14,8 +14,10 @@ import (
 	userhandler "github.com/faiyaz032/goplate/internal/rest/handler/user"
 	"github.com/go-playground/validator/v10"
 
+	"github.com/faiyaz032/goplate/internal/rest/middleware"
 	"github.com/faiyaz032/goplate/internal/user"
 	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 )
 
 func run(ctx context.Context, cfg *config.Config) error {
@@ -40,6 +42,10 @@ func run(ctx context.Context, cfg *config.Config) error {
 
 	// routing
 	r := chi.NewRouter()
+	r.Use(middleware.CORS())
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.Recoverer)
+
 	userhandler.RegisterRoutes(r, userHndlr)
 	authhandler.RegisterRoutes(r, authHndlr)
 
