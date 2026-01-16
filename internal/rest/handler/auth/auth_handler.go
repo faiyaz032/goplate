@@ -8,14 +8,14 @@ import (
 )
 
 type Handler struct {
-	svc      Service
 	validate *validator.Validate
+	svc      Service
 }
 
-func NewHandler(svc Service, validate *validator.Validate) *Handler {
+func NewHandler(validate *validator.Validate, svc Service) *Handler {
 	return &Handler{
-		svc:      svc,
 		validate: validate,
+		svc:      svc,
 	}
 }
 

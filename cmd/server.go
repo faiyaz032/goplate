@@ -12,6 +12,7 @@ import (
 	"github.com/faiyaz032/goplate/internal/repository"
 	authhandler "github.com/faiyaz032/goplate/internal/rest/handler/auth"
 	userhandler "github.com/faiyaz032/goplate/internal/rest/handler/user"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/faiyaz032/goplate/internal/user"
 	"github.com/go-chi/chi/v5"
@@ -26,13 +27,16 @@ func run(ctx context.Context, cfg *config.Config) error {
 	defer conn.Close(ctx)
 	queries := postgres.NewQueries(conn)
 
+	//pkg
+	v := validator.New()
+
 	// dependency injection
 	userRepo := repository.NewUserRepository(queries)
 	userSvc := user.NewService(userRepo)
 	userHndlr := userhandler.NewHandler(userSvc)
 
 	authSvc := auth.NewService(userSvc)
-	authHndlr := authhandler.NewHandler(authSvc)
+	authHndlr := authhandler.NewHandler(v, authSvc)
 
 	// routing
 	r := chi.NewRouter()
