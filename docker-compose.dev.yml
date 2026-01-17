@@ -3,14 +3,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: prod
-    container_name: goplate-app
-    restart: always
+      target: dev
+    container_name: goplate-app-dev
     ports:
       - "8080:8080"
-    environment:
-      - DATABASE_URL=postgres://postgres:root@postgres:5432/goplate?sslmode=disable
-      - APP_ENV=production
+    volumes:
+      - .:/app
+    env_file:
+      - .env.dev
     depends_on:
       postgres:
         condition: service_healthy
@@ -27,7 +27,7 @@ services:
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d goplate"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
     volumes:

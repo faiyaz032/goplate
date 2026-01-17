@@ -13,6 +13,8 @@ A Go boilerplate for building RESTful APIs.
 | **Migrations** | [goose](https://github.com/pressly/goose) |
 | **Validation** | [validator/v10](https://github.com/go-playground/validator) |
 | **Config** | [env/v11](https://github.com/caarlos0/env) |
+| **Logging** | [zap](https://github.com/uber-go/zap) |
+| **Hot Reload** | [air](https://github.com/air-verse/air) |
 
 ## Getting Started
 
@@ -42,6 +44,18 @@ A Go boilerplate for building RESTful APIs.
    ```
 
 4. **Run the application**:
+
+   **For Development (Docker with Hot Reload):**
+   ```bash
+   make dev
+   ```
+
+   **For Production (Docker Build):**
+   ```bash
+   make up
+   ```
+
+   **Standalone (Local):**
    ```bash
    go run ./cmd
    ```
@@ -52,6 +66,9 @@ Refer to the [Architecture Documentation](docs/ARCHITECTURE.md) for details on t
 
 ## Makefile Commands
 
+- `make dev`: Start development environment with **Docker hot reload** (via Air).
+- `make up`: Start production environment.
+- `make down`: Stop and remove containers.
 - `make migrate-up`: Apply migrations.
 - `make migrate-down`: Rollback last migration.
 - `make migration`: Create a new migration file.

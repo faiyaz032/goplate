@@ -66,3 +66,20 @@ Contains implementations for external resources like database connections.
 ## Dependency Injection
 
 Dependency Injection is handled manually in `cmd/server.go`. This provides a clear overview of how the application is wired together without the magic of reflection-based DI containers.
+
+## Observability
+
+### Logging
+The project uses **Uber Zap** for structured logging.
+- **Development**: Uses `NewDevelopment` configuration for human-readable, colorized terminal output.
+- **Production**: Uses `NewProduction` configuration for JSON-formatted logs, suitable for log aggregation systems.
+
+## Development Workflow
+
+### Hot Reloading
+We use **Air** for hot reloading during development. It monitors for file changes and automatically triggers a rebuild/restart of the application.
+
+### Dockerized Development
+To provide a consistent environment, the development workflow is fully dockerized.
+- **Dockerfile (dev target)**: Uses a multi-stage build specifying the `dev` target to include Air.
+- **Hot Reload in Docker**: The project directory is mounted as a volume in the container, allowing Air to watch local changes and update the running container instantly.

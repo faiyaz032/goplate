@@ -7,8 +7,9 @@ endif
 # --------------------------------------------------
 # Configuration
 # --------------------------------------------------
-MIGRATIONS_DIR = migrations
-COMPOSE_FILE   = docker-compose.yml
+MIGRATIONS_DIR   = migrations
+COMPOSE_FILE     = docker-compose.yml
+COMPOSE_DEV_FILE = docker-compose.dev.yml
 
 .DEFAULT_GOAL := help
 
@@ -26,25 +27,30 @@ help: ## Show this help message
 # --------------------------------------------------
 # Docker
 # --------------------------------------------------
+.PHONY: dev
+dev: ## Start development environment (with hot reload)
+	docker compose -f $(COMPOSE_DEV_FILE) up --build
+
 .PHONY: up
-up: ## Start services
-	docker compose -f $(COMPOSE_FILE) up -d --remove-orphans
+up: ## Start production environment
+	docker compose -f $(COMPOSE_FILE) up -d --build --remove-orphans
 
 .PHONY: down
-down: ## Stop and remove containers
+down: ## Stop and remove all containers
 	docker compose -f $(COMPOSE_FILE) down --remove-orphans
+	docker compose -f $(COMPOSE_DEV_FILE) down --remove-orphans
 
 .PHONY: restart
-restart: ## Restart containers
-	docker compose -f $(COMPOSE_FILE) restart
+restart: ## Restart dev environment
+	docker compose -f $(COMPOSE_DEV_FILE) restart
 
 .PHONY: logs
-logs: ## Follow container logs
-	docker compose -f $(COMPOSE_FILE) logs -f
+logs: ## Follow dev container logs
+	docker compose -f $(COMPOSE_DEV_FILE) logs -f
 
 .PHONY: ps
 ps: ## Show running containers
-	docker compose -f $(COMPOSE_FILE) ps
+	docker compose -f $(COMPOSE_DEV_FILE) ps
 
 # --------------------------------------------------
 # Database Migrations
