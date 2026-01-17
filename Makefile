@@ -29,7 +29,8 @@ help: ## Show this help message
 # --------------------------------------------------
 .PHONY: dev
 dev: ## Start development environment (with hot reload)
-	docker compose -f $(COMPOSE_DEV_FILE) up --build
+	docker compose -f $(COMPOSE_DEV_FILE) up -d --build
+	docker compose -f $(COMPOSE_DEV_FILE) logs -f app
 
 .PHONY: up
 up: ## Start production environment
@@ -46,7 +47,7 @@ restart: ## Restart dev environment
 
 .PHONY: logs
 logs: ## Follow dev container logs
-	docker compose -f $(COMPOSE_DEV_FILE) logs -f
+	docker compose -f $(COMPOSE_DEV_FILE) logs -f app
 
 .PHONY: ps
 ps: ## Show running containers
