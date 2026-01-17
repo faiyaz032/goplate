@@ -7,6 +7,7 @@ import (
 	db "github.com/faiyaz032/goplate/internal/infrastructure/db/sqlc"
 	"github.com/faiyaz032/goplate/internal/user"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 type UserRepository interface {
@@ -15,11 +16,13 @@ type UserRepository interface {
 
 type repository struct {
 	queries *db.Queries
+	log     *zap.Logger
 }
 
-func NewUserRepository(queries *db.Queries) UserRepository {
+func NewUserRepository(queries *db.Queries, log *zap.Logger) UserRepository {
 	return &repository{
 		queries: queries,
+		log:     log,
 	}
 }
 
@@ -31,7 +34,7 @@ func (r *repository) Create(ctx context.Context, record *domain.User) (*domain.U
 	})
 
 	if err != nil {
-
+		r.log.Error("failed to create user", zap.Error(err))
 		return nil, MapDBError(err, "user")
 	}
 
@@ -41,6 +44,7 @@ func (r *repository) Create(ctx context.Context, record *domain.User) (*domain.U
 func (r *repository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	record, err := r.queries.GetUser(ctx, id)
 	if err != nil {
+		r.log.Error("failed to find user by id", zap.Error(err))
 		return nil, MapDBError(err, "user")
 	}
 

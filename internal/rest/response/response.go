@@ -3,10 +3,10 @@ package response
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/faiyaz032/goplate/internal/domain"
+	"go.uber.org/zap"
 )
 
 type BaseResponse struct {
@@ -37,7 +37,7 @@ func PaginatedJSON(w http.ResponseWriter, status int, message string, data Pagin
 	JSON(w, status, message, data)
 }
 
-func HandleError(w http.ResponseWriter, err error) {
+func HandleError(w http.ResponseWriter, log *zap.Logger, err error) {
 	var appErr *domain.AppError
 	statusCode := http.StatusInternalServerError
 	message := "Internal server error"
@@ -45,7 +45,7 @@ func HandleError(w http.ResponseWriter, err error) {
 	if errors.As(err, &appErr) {
 
 		if appErr.Raw != nil {
-			log.Printf("[API ERROR] %v | Raw: %v", appErr.Message, appErr.Raw)
+			log.Error("API error", zap.String("message", appErr.Message), zap.Error(appErr.Raw))
 		}
 
 		switch {
@@ -67,7 +67,7 @@ func HandleError(w http.ResponseWriter, err error) {
 			message = "Internal server error"
 		}
 	} else {
-		log.Printf("[UNEXPECTED ERROR] %v", err)
+		log.Error("unexpected error", zap.Error(err))
 	}
 
 	w.Header().Set("Content-Type", "application/json")

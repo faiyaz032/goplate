@@ -5,28 +5,36 @@ import (
 	"net/http"
 
 	"github.com/faiyaz032/goplate/internal/domain"
+	"github.com/faiyaz032/goplate/internal/rest/response"
+	"go.uber.org/zap"
 )
 
 type Handler struct {
 	svc Service
+	log *zap.Logger
 }
 
-func NewHandler(svc Service) *Handler {
+func NewHandler(svc Service, log *zap.Logger) *Handler {
 	return &Handler{
 		svc,
+		log,
 	}
 }
 
 func (h Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user domain.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		response.HandleError(w, h.log, &domain.AppError{
+			Err:     domain.ErrBadRequest,
+			Message: "Invalid request body",
+			Raw:     err,
+		})
 		return
 	}
 
 	createdUser, err := h.svc.Create(r.Context(), &user)
 	if err != nil {
-		http.Error(w, "failed to create user: "+err.Error(), http.StatusInternalServerError)
+		response.HandleError(w, h.log, err)
 		return
 	}
 
